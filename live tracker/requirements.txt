@@ -1,10 +1,9 @@
 ﻿Flask
-Flask-SQLAlchemy
 Flask-SocketIO
-Flask-Bcrypt
+Flask-SQLAlchemy
 Flask-Login
-python-socketio
-eventlet
-openpyxl
-fpdf2
+Flask-Bcrypt
 python-dotenv
+eventlet
+gunicorn
+psycopg2-binary
