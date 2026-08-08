@@ -1,9 +1,9 @@
-﻿Flask
+Flask
 Flask-SocketIO
 Flask-SQLAlchemy
 Flask-Login
 Flask-Bcrypt
 python-dotenv
-eventlet
 gunicorn
+simple-websocket
 psycopg2-binary
