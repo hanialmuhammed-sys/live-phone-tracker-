@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby — Set Up Your Family</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        :root {
+            --bg: #0f1115;
+            --surface: #181b22;
+            --border: #2a2f3a;
+            --text: #e8eaf0;
+            --text-muted: #9aa3b5;
+            --accent: #6ee7b7;
+            --accent-hover: #34d399;
+            --error-bg: rgba(248, 113, 113, 0.1);
+            --error-border: rgba(248, 113, 113, 0.35);
+            --error-text: #f87171;
+            --radius: 12px;
+            --shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .auth {
+            width: 100%;
+            max-width: 720px;
+            padding: 1.5rem;
+        }
+
+        .auth__card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.75rem 2.25rem;
+            box-shadow: var(--shadow);
+        }
+
+        .auth__card--wide {
+            max-width: 720px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 2rem;
+        }
+
+        .brand__mark {
+            color: var(--accent);
+            font-size: 1.35rem;
+            line-height: 1;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .brand__name {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 600;
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .auth__title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 1.8rem;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth__subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.75rem;
+            line-height: 1.55;
+        }
+
+        .auth__flash {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            padding: 0.9rem 1.1rem;
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            border-radius: var(--radius);
+            color: var(--error-text);
+            font-size: 0.9rem;
+        }
+
+        .auth__flash li + li {
+            margin-top: 0.3rem;
+        }
+
+        /* Two-column layout */
+        .family-setup__columns {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1.75rem;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .family-setup__column h3 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 1.15rem;
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.02em;
+        }
+
+        .family-setup__divider {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            height: 100%;
+            min-height: 140px;
+            position: relative;
+        }
+
+        .family-setup__divider::before,
+        .family-setup__divider::after {
+            content: "";
+            flex: 1;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .family-setup__divider span {
+            padding: 0.75rem 0;
+            background: var(--surface);
+        }
+
+        .auth__form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        .auth__form label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: -0.45rem;
+        }
+
+        .auth__form input {
+            width: 100%;
+            padding: 0.85rem 1.05rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .auth__form input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.2);
+        }
+
+        .auth__form input.mono {
+            font-family: 'IBM Plex Mono', monospace;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .auth__submit {
+            margin-top: 0.4rem;
+            padding: 0.9rem 1.25rem;
+            background: var(--accent);
+            color: #0f1115;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .auth__submit:hover {
+            background: var(--accent-hover);
+        }
+
+        .auth__submit:active {
+            transform: scale(0.985);
+        }
+
+        .auth__submit--secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1.5px solid var(--accent);
+        }
+
+        .auth__submit--secondary:hover {
+            background: rgba(110, 231, 183, 0.1);
+            color: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        .auth__switch {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .auth__switch a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth__switch a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive: stack on smaller screens */
+        @media (max-width: 640px) {
+            .family-setup__columns {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .family-setup__divider {
+                flex-direction: row;
+                min-height: auto;
+                width: 100%;
+            }
+
+            .family-setup__divider::before,
+            .family-setup__divider::after {
+                height: 1px;
+                width: auto;
+                flex: 1;
+            }
+
+            .family-setup__divider span {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="auth">
+        <div class="auth__card auth__card--wide">
+            <div class="brand">
+                <span class="brand__mark" aria-hidden="true">&#9679;</span>
+                <h1 class="brand__name">Nearby</h1>
+            </div>
+
+            <h2 class="auth__title">Set up your family</h2>
+            <p class="auth__subtitle">Create a new family to invite others into, or join one with a code someone shared with you.</p>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="auth__flash" role="alert">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            <div class="family-setup__columns">
+
+                <section class="family-setup__column" aria-labelledby="create-family-heading">
+                    <h3 id="create-family-heading">Create a family</h3>
+                    <form class="auth__form" method="POST" action="{{ url_for('family.create_family') }}" novalidate>
+                        <label for="name">Family name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Weekend Family"
+                            autocomplete="off"
+                            minlength="2"
+                            maxlength="100"
+                            required
+                        >
+                        <button type="submit" class="auth__submit">Create Family</button>
+                    </form>
+                </section>
+
+                <div class="family-setup__divider" role="separator" aria-orientation="vertical">
+                    <span>or</span>
+                </div>
+
+                <section class="family-setup__column" aria-labelledby="join-family-heading">
+                    <h3 id="join-family-heading">Join a family</h3>
+                    <form class="auth__form" method="POST" action="{{ url_for('family.join_family') }}" novalidate>
+                        <label for="invite_code">Invite code</label>
+                        <input
+                            type="text"
+                            id="invite_code"
+                            name="invite_code"
+                            placeholder="A7KD91"
+                            autocomplete="off"
+                            autocapitalize="characters"
+                            inputmode="text"
+                            pattern="[A-Za-z0-9]{6}"
+                            maxlength="6"
+                            title="6-character invite code"
+                            class="mono"
+                            required
+                        >
+                        <button type="submit" class="auth__submit auth__submit--secondary">Join Family</button>
+                    </form>
+                </section>
+
+            </div>
+
+            <p class="auth__switch"><a href="{{ url_for('auth.logout') }}">Log out</a></p>
+        </div>
+    </main>
+
+</body>
+</html>

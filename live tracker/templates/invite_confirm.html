@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby — Join {{ family.family_name }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        :root {
+            --bg: #0f1115;
+            --surface: #181b22;
+            --border: #2a2f3a;
+            --text: #e8eaf0;
+            --text-muted: #9aa3b5;
+            --accent: #6ee7b7;
+            --accent-hover: #34d399;
+            --radius: 12px;
+            --shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .auth { width: 100%; max-width: 420px; padding: 1.5rem; }
+
+        .auth__card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.75rem 2.25rem;
+            box-shadow: var(--shadow);
+        }
+
+        .brand { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 2rem; }
+        .brand__mark { color: var(--accent); font-size: 1.35rem; font-family: 'IBM Plex Mono', monospace; }
+        .brand__name { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 1.5rem; letter-spacing: -0.02em; }
+
+        .auth__title { font-family: 'Fraunces', Georgia, serif; font-weight: 500; font-size: 1.8rem; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+        .auth__subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.75rem; line-height: 1.55; }
+
+        .auth__submit {
+            width: 100%;
+            padding: 0.9rem 1.25rem;
+            background: var(--accent);
+            color: #0f1115;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .auth__submit:hover { background: var(--accent-hover); }
+
+        .auth__switch { margin-top: 1.75rem; text-align: center; font-size: 0.9rem; }
+        .auth__switch a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        .auth__switch a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <main class="auth">
+        <div class="auth__card">
+            <div class="brand">
+                <span class="brand__mark" aria-hidden="true">&#9679;</span>
+                <h1 class="brand__name">Nearby</h1>
+            </div>
+
+            <h2 class="auth__title">Join {{ family.family_name }}?</h2>
+            <p class="auth__subtitle">You've been invited to join this family and share your location with its members.</p>
+
+            <form method="POST" action="{{ url_for('family.join_family') }}">
+                <input type="hidden" name="invite_code" value="{{ code }}">
+                <button type="submit" class="auth__submit">Join</button>
+            </form>
+
+            <p class="auth__switch"><a href="{{ url_for('dashboard.dashboard') }}">Cancel</a></p>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby — Family Management</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        :root {
+            --bg: #0f1115;
+            --surface: #181b22;
+            --border: #2a2f3a;
+            --text: #e8eaf0;
+            --text-muted: #9aa3b5;
+            --accent: #6ee7b7;
+            --accent-hover: #34d399;
+            --error-bg: rgba(248, 113, 113, 0.1);
+            --error-border: rgba(248, 113, 113, 0.35);
+            --error-text: #f87171;
+            --radius: 12px;
+            --shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2rem 1rem;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .auth { width: 100%; max-width: 760px; }
+
+        .auth__card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem 2.25rem;
+            box-shadow: var(--shadow);
+        }
+
+        .brand { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.75rem; }
+        .brand__mark { color: var(--accent); font-size: 1.35rem; font-family: 'IBM Plex Mono', monospace; }
+        .brand__name { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 1.5rem; letter-spacing: -0.02em; }
+
+        .auth__title { font-family: 'Fraunces', Georgia, serif; font-weight: 500; font-size: 1.8rem; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
+        .auth__subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+        .auth__flash {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            padding: 0.9rem 1.1rem;
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            border-radius: var(--radius);
+            color: var(--error-text);
+            font-size: 0.9rem;
+        }
+
+        .family-manage__section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .family-manage__section:last-of-type { border-bottom: none; }
+
+        .family-manage__section h3 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .family-manage__members { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .family-manage__member {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.9rem 1.1rem;
+        }
+
+        .family-manage__member-name {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 0;
+        }
+        .family-manage__member-name:hover { color: var(--accent); }
+
+        .family-manage__role {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(110, 231, 183, 0.1);
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+        }
+
+        .family-manage__status { font-size: 0.85rem; margin-left: auto; }
+
+        .family-manage__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            width: 100%;
+            margin-top: 0.35rem;
+        }
+
+        .family-manage__actions button {
+            padding: 0.35rem 0.7rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+        }
+        .family-manage__actions button:hover { border-color: var(--accent); color: var(--accent); }
+
+        .family-manage__danger {
+            background: transparent !important;
+            border-color: var(--error-text) !important;
+            color: var(--error-text) !important;
+        }
+
+        .family-manage__profile {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+        }
+
+        .family-manage__profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.85rem;
+            margin: 1rem 0;
+        }
+
+        .family-manage__profile-grid div {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+        .family-manage__profile-grid span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.2rem;
+        }
+        .family-manage__profile-grid strong { font-size: 0.95rem; }
+
+        #profile-close {
+            padding: 0.45rem 0.9rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        #profile-close:hover { border-color: var(--accent); color: var(--accent); }
+
+        .mono { font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.04em; }
+
+        .family-manage__activity { list-style: none; }
+        .family-manage__activity li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .family-manage__empty { color: var(--text-muted); font-style: italic; }
+
+        .family-manage__rename {
+            display: flex;
+            gap: 0.6rem;
+            margin: 1rem 0;
+        }
+        .family-manage__rename input {
+            flex: 1;
+            padding: 0.65rem 0.9rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        .family-manage__rename button,
+        .family-manage__section > form > button {
+            padding: 0.65rem 1rem;
+            background: var(--accent);
+            color: #0f1115;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .family-manage__section > form > button:hover { background: var(--accent-hover); }
+
+        .auth__switch { margin-top: 1.5rem; text-align: center; font-size: 0.9rem; }
+        .auth__switch a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        .auth__switch a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <main class="auth">
+        <div class="auth__card auth__card--wide">
+            <div class="brand">
+                <span class="brand__mark" aria-hidden="true">&#9679;</span>
+                <h1 class="brand__name">Nearby</h1>
+            </div>
+
+            <h2 class="auth__title">{{ family.family_name }}</h2>
+            <p class="auth__subtitle">Family Management</p>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="auth__flash" role="alert">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            <section class="family-manage__section">
+                <h3>Members</h3>
+                <ul class="family-manage__members" id="member-cards">
+                    {% for member in members %}
+                        <li class="family-manage__member" data-user-id="{{ member.id }}">
+                            <button type="button" class="family-manage__member-name" data-profile-trigger="{{ member.id }}">
+                                {% if member.role == "owner" %}👑{% elif member.role == "admin" %}🛡{% else %}👤{% endif %}
+                                {{ member.username }}
+                            </button>
+
+                            <span class="family-manage__role">{{ member.role|capitalize }}</span>
+                            <span class="family-manage__status" data-status-for="{{ member.id }}">&mdash;</span>
+
+                            <div class="family-manage__actions">
+                                {% if member.id != current_user.id %}
+                                    {% if can_change_roles and member.role == "member" %}
+                                        <form method="POST" action="{{ url_for('family.promote_member', user_id=member.id) }}">
+                                            <button type="submit">Promote</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if can_change_roles and member.role == "admin" %}
+                                        <form method="POST" action="{{ url_for('family.demote_member', user_id=member.id) }}">
+                                            <button type="submit">Demote</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if can_transfer and member.role != "owner" %}
+                                        <form method="POST" action="{{ url_for('family.transfer_ownership', user_id=member.id) }}" onsubmit="return confirm('Transfer ownership to {{ member.username }}? You will become an Admin.');">
+                                            <button type="submit">Transfer Ownership</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if can_remove and member.role != "owner" %}
+                                        <form method="POST" action="{{ url_for('family.remove_member', user_id=member.id) }}" onsubmit="return confirm('Remove {{ member.username }}?');">
+                                            <button type="submit" class="family-manage__danger">Remove</button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section class="family-manage__section family-manage__profile" id="member-profile" hidden>
+                <h3 id="profile-name">&mdash;</h3>
+                <div class="family-manage__profile-grid">
+                    <div><span>Battery</span><strong id="profile-battery">&mdash;</strong></div>
+                    <div><span>Last Seen</span><strong id="profile-last-seen">&mdash;</strong></div>
+                    <div><span>Today's Distance</span><strong id="profile-distance">&mdash;</strong></div>
+                    <div><span>Average Speed</span><strong id="profile-speed">&mdash;</strong></div>
+                    <div><span>Current Place</span><strong id="profile-place">&mdash;</strong></div>
+                </div>
+                <button type="button" id="profile-close">Close</button>
+            </section>
+
+            <section class="family-manage__section">
+                <h3>Invite Members</h3>
+                <p>Invite code: <span class="mono">{{ family.invite_code }}</span></p>
+                <p style="margin-top:0.4rem">Invite link: <span class="mono" id="invite-link">{{ request.host_url.rstrip('/') }}{{ url_for('family.invite_link', code=family.invite_code) }}</span></p>
+                {% if can_invite %}
+                    <form method="POST" action="{{ url_for('family.regenerate_invite_code') }}" onsubmit="return confirm('Generate a new invite code? The old code will stop working.');" style="margin-top:1rem">
+                        <button type="submit">Generate New Invite Code</button>
+                    </form>
+                {% endif %}
+            </section>
+
+            <section class="family-manage__section">
+                <h3>Activity</h3>
+                <ul class="family-manage__activity" id="activity-log">
+                    {% for entry in activity %}
+                        <li>{{ entry.message }}</li>
+                    {% else %}
+                        <li class="family-manage__empty">No activity yet.</li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section class="family-manage__section">
+                <h3>Family Settings</h3>
+                <div class="family-manage__profile-grid">
+                    <div><span>Family Name</span><strong>{{ family.family_name }}</strong></div>
+                    <div><span>Invite Code</span><strong class="mono">{{ family.invite_code }}</strong></div>
+                    <div><span>Members</span><strong>{{ members|length }}</strong></div>
+                    <div><span>Created</span><strong>{{ family.created_at.strftime("%b %Y") }}</strong></div>
+                    <div><span>Owner</span><strong>{{ members|selectattr("role", "equalto", "owner")|map(attribute="username")|first }}</strong></div>
+                </div>
+
+                {% if can_delete %}
+                    <form method="POST" action="{{ url_for('family.rename_family') }}" class="family-manage__rename">
+                        <input type="text" name="name" placeholder="New family name" required>
+                        <button type="submit">Rename</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('family.delete_family') }}" onsubmit="return confirm('Delete this family for everyone? This cannot be undone.');">
+                        <button type="submit" class="family-manage__danger">Delete Family</button>
+                    </form>
+                {% endif %}
+            </section>
+
+            <p class="auth__switch"><a href="{{ url_for('dashboard.dashboard') }}">&larr; Back to dashboard</a></p>
+        </div>
+    </main>
+
+    <script>
+        async function loadOnlineStatus() {
+            try {
+                const response = await fetch("/location");
+                const members = await response.json();
+
+                document.querySelectorAll("[data-status-for]").forEach(el => {
+                    el.textContent = "🔴 Offline";
+                });
+
+                members.forEach(member => {
+                    const el = document.querySelector(`[data-status-for="${member.id}"]`);
+                    if (!el) return;
+                    el.textContent = "🟢 Online";
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        loadOnlineStatus();
+
+        const profilePanel = document.getElementById("member-profile");
+
+        document.querySelectorAll("[data-profile-trigger]").forEach(button => {
+            button.addEventListener("click", async () => {
+                const userId = button.dataset.profileTrigger;
+
+                try {
+                    const response = await fetch(`/family/member/${userId}/profile`);
+                    const profile = await response.json();
+
+                    document.getElementById("profile-name").textContent = profile.username;
+                    document.getElementById("profile-battery").textContent = profile.battery != null ? `${profile.battery}%` : "—";
+                    document.getElementById("profile-last-seen").textContent = profile.last_seen
+                        ? new Date(profile.last_seen + "Z").toLocaleTimeString()
+                        : "—";
+                    document.getElementById("profile-distance").textContent = `${profile.distance_today} km`;
+                    document.getElementById("profile-speed").textContent = `${profile.average_speed} km/h`;
+                    document.getElementById("profile-place").textContent = profile.current_place || "Unknown";
+
+                    profilePanel.hidden = false;
+                    profilePanel.scrollIntoView({ behavior: "smooth", block: "center" });
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+        });
+
+        document.getElementById("profile-close").addEventListener("click", () => {
+            profilePanel.hidden = true;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby — Travel Analytics</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        :root {
+            --bg: #0f1115;
+            --surface: #181b22;
+            --border: #2a2f3a;
+            --text: #e8eaf0;
+            --text-muted: #9aa3b5;
+            --accent: #6ee7b7;
+            --accent-hover: #34d399;
+            --radius: 12px;
+            --shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            padding: 2rem 1rem;
+        }
+
+        .auth { width: 100%; max-width: 720px; }
+
+        .auth__card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.75rem 2.25rem;
+            box-shadow: var(--shadow);
+        }
+
+        .brand { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 2rem; }
+        .brand__mark { color: var(--accent); font-size: 1.35rem; font-family: 'IBM Plex Mono', monospace; }
+        .brand__name { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 1.5rem; letter-spacing: -0.02em; }
+
+        .auth__title { font-family: 'Fraunces', Georgia, serif; font-weight: 500; font-size: 1.8rem; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
+        .auth__subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.75rem; }
+
+        .analytics__stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .analytics__stat {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.1rem;
+            text-align: center;
+        }
+
+        .analytics__stat-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+        .analytics__stat-value { font-family: 'Fraunces', Georgia, serif; font-size: 1.4rem; font-weight: 500; color: var(--accent); }
+
+        .analytics__section { margin-bottom: 2rem; }
+        .analytics__section h3 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 1.15rem;
+            margin-bottom: 1rem;
+        }
+
+        .analytics__bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.6rem;
+            height: 140px;
+            padding-top: 0.5rem;
+        }
+
+        .analytics__bar-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .analytics__bar {
+            width: 100%;
+            background: linear-gradient(to top, var(--accent), #34d399);
+            border-radius: 6px 6px 0 0;
+            min-height: 4px;
+            transition: height 0.3s ease;
+        }
+
+        .analytics__bar-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+        .analytics__speed-chart {
+            width: 100%;
+            height: 160px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .analytics__places { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+
+        .analytics__place {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.85rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .analytics__place-name { font-weight: 600; flex: 1; }
+        .analytics__place-time { color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; }
+        .analytics__place-duration { color: var(--accent); font-weight: 500; }
+        .analytics__place--empty { color: var(--text-muted); justify-content: center; }
+
+        .analytics__export { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+        .analytics__export-btn {
+            padding: 0.6rem 1.1rem;
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: background 0.15s ease;
+        }
+        .analytics__export-btn:hover { background: rgba(110, 231, 183, 0.12); }
+
+        .auth__switch { margin-top: 2rem; text-align: center; font-size: 0.9rem; }
+        .auth__switch a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        .auth__switch a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <main class="auth">
+        <div class="auth__card auth__card--wide">
+            <div class="brand">
+                <span class="brand__mark" aria-hidden="true">&#9679;</span>
+                <h1 class="brand__name">Nearby</h1>
+            </div>
+
+            <h2 class="auth__title">📊 Travel Analytics</h2>
+            <p class="auth__subtitle">Today's activity, this week's distance, and where you spent your time.</p>
+
+            <div class="analytics__stats">
+                <div class="analytics__stat">
+                    <p class="analytics__stat-label">Distance Today</p>
+                    <p class="analytics__stat-value">{{ stats.distance }} km</p>
+                </div>
+                <div class="analytics__stat">
+                    <p class="analytics__stat-label">Average Speed</p>
+                    <p class="analytics__stat-value">{{ stats.average_speed }} km/h</p>
+                </div>
+                <div class="analytics__stat">
+                    <p class="analytics__stat-label">Maximum Speed</p>
+                    <p class="analytics__stat-value">{{ stats.max_speed }} km/h</p>
+                </div>
+                <div class="analytics__stat">
+                    <p class="analytics__stat-label">Time Moving</p>
+                    <p class="analytics__stat-value" id="moving-time" data-seconds="{{ stats.moving_time }}">&mdash;</p>
+                </div>
+                <div class="analytics__stat">
+                    <p class="analytics__stat-label">Time Stationary</p>
+                    <p class="analytics__stat-value" id="stationary-time" data-seconds="{{ stats.stationary_time }}">&mdash;</p>
+                </div>
+            </div>
+
+            <section class="analytics__section">
+                <h3>Distance This Week</h3>
+                <div class="analytics__bars">
+                    {% for day in week %}
+                        <div class="analytics__bar-col">
+                            <div class="analytics__bar" style="height: {{ day.height_pct }}%;" title="{{ day.distance }} km"></div>
+                            <span class="analytics__bar-label">{{ day.day }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="analytics__section">
+                <h3>Speed Over Time (Today)</h3>
+                <svg id="speed-chart" class="analytics__speed-chart" viewBox="0 0 600 160" preserveAspectRatio="none"></svg>
+            </section>
+
+            <section class="analytics__section">
+                <h3>Places Visited Today</h3>
+                <ul class="analytics__places">
+                    {% for visit in visits %}
+                        <li class="analytics__place">
+                            <span class="analytics__place-name">{{ visit.place }}</span>
+                            <span class="analytics__place-time">{{ visit.arrival }} &ndash; {{ visit.departure }}</span>
+                            <span class="analytics__place-duration" data-seconds="{{ visit.duration_seconds }}">&mdash;</span>
+                        </li>
+                    {% else %}
+                        <li class="analytics__place analytics__place--empty">No visits of 10+ minutes recorded yet today.</li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section class="analytics__section">
+                <h3>Export</h3>
+                <div class="analytics__export">
+                    <a href="{{ url_for('analytics.export_pdf') }}" class="analytics__export-btn">PDF</a>
+                    <a href="{{ url_for('analytics.export_csv') }}" class="analytics__export-btn">CSV</a>
+                    <a href="{{ url_for('analytics.export_xlsx') }}" class="analytics__export-btn">Excel</a>
+                </div>
+            </section>
+
+            <p class="auth__switch"><a href="{{ url_for('dashboard.dashboard') }}">&larr; Back to dashboard</a></p>
+        </div>
+    </main>
+
+    <script>
+        function formatDuration(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.round((seconds % 3600) / 60);
+            if (h > 0) return `${h}h ${m}m`;
+            return `${m}m`;
+        }
+
+        document.querySelectorAll("[data-seconds]").forEach(el => {
+            el.textContent = formatDuration(Number(el.dataset.seconds));
+        });
+
+        async function loadSpeedChart() {
+            try {
+                const response = await fetch("{{ url_for('analytics.speeds') }}");
+                const series = await response.json();
+
+                const svg = document.getElementById("speed-chart");
+                if (series.length === 0) {
+                    svg.innerHTML = `<text x="300" y="80" fill="#9aa3b5" text-anchor="middle" font-size="14">No speed data yet today</text>`;
+                    return;
+                }
+
+                const width = 600;
+                const height = 160;
+                const padding = 20;
+                const maxSpeed = Math.max(...series.map(p => p.speed), 1);
+
+                const points = series.map((p, i) => {
+                    const x = padding + (i / Math.max(series.length - 1, 1)) * (width - padding * 2);
+                    const y = height - padding - (p.speed / maxSpeed) * (height - padding * 2);
+                    return `${x},${y}`;
+                }).join(" ");
+
+                svg.innerHTML = `
+                    <polyline points="${points}" fill="none" stroke="#6ee7b7" stroke-width="2.5" />
+                    ${series.map((p, i) => {
+                        const x = padding + (i / Math.max(series.length - 1, 1)) * (width - padding * 2);
+                        const y = height - padding - (p.speed / maxSpeed) * (height - padding * 2);
+                        return `<circle cx="${x}" cy="${y}" r="3" fill="#6ee7b7" />`;
+                    }).join("")}
+                `;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        loadSpeedChart();
+    </script>
+</body>
+</html>

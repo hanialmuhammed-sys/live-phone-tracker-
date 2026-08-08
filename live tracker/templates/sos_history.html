@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby — SOS History</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        :root {
+            --bg: #0f1115;
+            --surface: #181b22;
+            --border: #2a2f3a;
+            --text: #e8eaf0;
+            --text-muted: #9aa3b5;
+            --accent: #6ee7b7;
+            --accent-hover: #34d399;
+            --error-bg: rgba(248, 113, 113, 0.1);
+            --error-border: rgba(248, 113, 113, 0.35);
+            --error-text: #f87171;
+            --radius: 12px;
+            --shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .auth { width: 100%; max-width: 640px; padding: 1.5rem; }
+
+        .auth__card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.75rem 2.25rem;
+            box-shadow: var(--shadow);
+        }
+
+        .brand { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 2rem; }
+        .brand__mark { color: var(--accent); font-size: 1.35rem; font-family: 'IBM Plex Mono', monospace; }
+        .brand__name { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 1.5rem; letter-spacing: -0.02em; }
+
+        .auth__title { font-family: 'Fraunces', Georgia, serif; font-weight: 500; font-size: 1.8rem; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
+        .auth__subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.75rem; }
+
+        .sos-history { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; }
+
+        .sos-history__item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem 1.15rem;
+        }
+
+        .sos-history__item[data-status="active"] {
+            border-color: rgba(248, 113, 113, 0.45);
+            background: rgba(248, 113, 113, 0.06);
+        }
+
+        .sos-history__row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .sos-history__name { font-weight: 600; }
+        .sos-history__status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        .sos-history__item[data-status="active"] .sos-history__status { color: var(--error-text); }
+
+        .sos-history__time { font-size: 0.85rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+        .sos-history__message { font-size: 0.9rem; color: var(--text-muted); font-style: italic; }
+
+        .sos-history__resolve-form { margin-top: 0.75rem; }
+        .sos-history__resolve {
+            padding: 0.45rem 0.9rem;
+            background: var(--accent);
+            color: #0f1115;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .sos-history__resolve:hover { background: var(--accent-hover); }
+
+        .sos-history__empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem 1rem;
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+        }
+
+        .auth__switch { margin-top: 2rem; text-align: center; font-size: 0.9rem; }
+        .auth__switch a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        .auth__switch a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <main class="auth">
+        <div class="auth__card auth__card--wide">
+            <div class="brand">
+                <span class="brand__mark" aria-hidden="true">&#9679;</span>
+                <h1 class="brand__name">Nearby</h1>
+            </div>
+
+            <h2 class="auth__title">SOS History</h2>
+            <p class="auth__subtitle">Every emergency alert sent by your family, most recent first.</p>
+
+            <ul class="sos-history">
+                {% for alert in alerts %}
+                    {% set sender = users_by_id.get(alert.user_id) %}
+                    <li class="sos-history__item" data-status="{{ alert.status|lower }}">
+                        <div class="sos-history__row">
+                            <span class="sos-history__name">🚨 {{ sender.username if sender else "Unknown" }}</span>
+                            <span class="sos-history__status">{{ alert.status }}</span>
+                        </div>
+                        <div class="sos-history__row">
+                            <span class="sos-history__time">{{ alert.created_at.strftime("%d %b, %H:%M") }}</span>
+                            {% if alert.message %}
+                                <span class="sos-history__message">&ldquo;{{ alert.message }}&rdquo;</span>
+                            {% endif %}
+                        </div>
+                        {% if alert.status == "ACTIVE" %}
+                            <form method="POST" action="{{ url_for('sos.resolve_sos', alert_id=alert.id) }}" class="sos-history__resolve-form">
+                                <button type="submit" class="sos-history__resolve">Resolve</button>
+                            </form>
+                        {% endif %}
+                    </li>
+                {% else %}
+                    <li class="sos-history__empty">No emergency alerts yet.</li>
+                {% endfor %}
+            </ul>
+
+            <p class="auth__switch"><a href="{{ url_for('dashboard.dashboard') }}">&larr; Back to dashboard</a></p>
+        </div>
+    </main>
+</body>
+</html>

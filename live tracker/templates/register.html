@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby — Register</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        :root {
+            --bg: #0f1115;
+            --surface: #181b22;
+            --border: #2a2f3a;
+            --text: #e8eaf0;
+            --text-muted: #9aa3b5;
+            --accent: #6ee7b7;
+            --accent-hover: #34d399;
+            --error-bg: rgba(248, 113, 113, 0.1);
+            --error-border: rgba(248, 113, 113, 0.35);
+            --error-text: #f87171;
+            --radius: 12px;
+            --shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .auth {
+            width: 100%;
+            max-width: 420px;
+            padding: 1.5rem;
+        }
+
+        .auth__card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.75rem 2.25rem;
+            box-shadow: var(--shadow);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 2.25rem;
+        }
+
+        .brand__mark {
+            color: var(--accent);
+            font-size: 1.35rem;
+            line-height: 1;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .brand__name {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 600;
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .auth__title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
+            font-size: 1.8rem;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.75rem;
+        }
+
+        .auth__flash {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            padding: 0.9rem 1.1rem;
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            border-radius: var(--radius);
+            color: var(--error-text);
+            font-size: 0.9rem;
+        }
+
+        .auth__flash li + li {
+            margin-top: 0.3rem;
+        }
+
+        .auth__form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.15rem;
+        }
+
+        .auth__form label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: -0.5rem;
+        }
+
+        .auth__form input {
+            width: 100%;
+            padding: 0.85rem 1.05rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .auth__form input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.2);
+        }
+
+        .auth__submit {
+            margin-top: 0.6rem;
+            padding: 0.9rem 1.25rem;
+            background: var(--accent);
+            color: #0f1115;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .auth__submit:hover {
+            background: var(--accent-hover);
+        }
+
+        .auth__submit:active {
+            transform: scale(0.985);
+        }
+
+        .auth__switch {
+            margin-top: 1.85rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .auth__switch a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth__switch a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth">
+        <div class="auth__card">
+            <div class="brand">
+                <span class="brand__mark">&#9679;</span>
+                <h1 class="brand__name">Nearby</h1>
+            </div>
+
+            <h2 class="auth__title">Create your account</h2>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="auth__flash">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            <form class="auth__form" method="POST" action="{{ url_for('auth.register') }}">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+
+                <button type="submit" class="auth__submit">Register</button>
+            </form>
+
+            <p class="auth__switch">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+        </div>
+    </div>
+
+</body>
+</html>
